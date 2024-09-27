@@ -69,6 +69,42 @@ declare namespace vim {
         /**
         */
         // function eval(this: void, expr: string): any;
+        /**
+        Spawn cmd as job annd returns job ID on success or 0, -1 on fail
+        @param cmd Command in form of table or string
+        @param opts Option table
+        */
+        function jobstart(this: void, cmd: any, opts: any): number;
+        /**
+        Stops job with id. Returns 1 if valid id or 0 if id is invalid
+        @param id ID of job to stop
+        */
+        function jobstop(this: void, id: number): number;
+        /**
+        Waits for jobs. Returns list of exit codes
+        @param jobs List of jobs to wait for
+        @param timeout Max wait time, if -1 wait forever
+        */
+        function jobwait(this: void, jobs: any, timeout: number): number;
+        /**
+        Get position for expression
+        @param expr See :h line()
+        */
+        function getpos(this: void, expr: string): LineInfo;
+        /**
+        Returns line number for expression
+        @param expr See :h line()
+        */
+        function line(this: void, expr: string): number;
+        /**
+        Returns column number for expression
+        @param expr See :h col()
+        */
+        function col(this: void, expr: string): number;
+        /**
+        Returns string that indicates current mode
+        */
+        function mode(this: void): string;
     }
     /**
     Gets a human-readable representation of the given object.
@@ -139,6 +175,23 @@ declare namespace vim {
         @param msg message to write
         */
         function nvim_err_writeln(this: void, msg: string): any;
+        /**
+        Gets line-range from buffer
+        @param buffer Buffer handle or 0 for current buffer
+        @param start First line index (0 based)
+        @param end Last line index, exclusive
+        @param strict_indexing Should out of bounds throw error
+        */
+        function nvim_buf_get_lines(this: void, buffer: number, start: number, end: number, strict_indexing: boolean): string[];
+        /**
+        Gets range from buffer
+        @param buffer Buffer handle, or 0 for current buffer
+        @param start_row First line index
+        @param start_col Starting column (byte offset) on first line
+        @param end_row Last line index, inclusive
+        @param end_col Ending column (byte offset) on last line, exclusive
+        */
+        function nvim_buf_get_text(this: void, buffer: number, start_row: number, start_col: number, end_row: number, end_col: number, opts: any): string[];
     }
 }
 
@@ -176,3 +229,38 @@ declare namespace debug {
         sub(num: number): string;
     }
 }
+
+interface LineInfo {
+    /// Buffer number
+    bufnum: number;
+    /// Line number
+    lnum: number;
+    /// Column number
+    col: number;
+    /// Offset in screen columns
+    off: number;
+}
+
+interface UserCommandArgs {
+    /// Args passed to command
+    args: string;
+    /// Was executed with !
+    bang: boolean;
+    /// Any count supplied
+    count: number;
+    /// Args split by unescaped whitespace
+    fargs: any;
+    /// Starting line of command range
+    line1: number;
+    /// Ending line of command range
+    line2: number;
+    /// Command modifiers
+    mods: string;
+    /// Number of items in command range (lines)
+    range: number;
+    /// Optional register
+    reg: string;
+    /// Command modifiers in structured format
+    smods: any;
+}
+
